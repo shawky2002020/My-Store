@@ -1,0 +1,26 @@
+.store{
+  height: 450px;
+  background: #504e4e;
+}
+.store-name{
+  padding-top: 10px;
+  text-align: center;
+  color: #fff;
+}
+.filter{
+  margin: auto;
+  width: 60%;
+  padding-top: 20px;
+  padding-bottom: 6px;
+  color: #fff;
+
+}
+.sort{
+  display: flex;
+  justify-content: center;
+  margin: auto;
+}
+.cart{
+  color: #fff;
+
+}
