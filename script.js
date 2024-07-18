@@ -12,13 +12,15 @@ class Product {
 
 let products = [];
 let cart = [];
+const productsPerPage = 10; // Number of products to display per page
+let currentPage = 1; // Track the current page
 
 function fetchProducts() {
   fetch('https://fakestoreapi.com/products')
     .then(response => response.json())
     .then(data => {
       products = data.map(productDetails => new Product(productDetails));
-      displayProducts(products); // Display all products initially
+      applyFilters(); // Apply filters and display the first page of products
     })
     .catch(error => console.error('Error fetching products:', error));
 }
@@ -64,10 +66,17 @@ function applyFilters() {
   displayProducts(filteredProducts);
 }
 
+function getCurrentPageProducts(filteredProducts) {
+  const startIndex = (currentPage - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  return filteredProducts.slice(startIndex, endIndex);
+}
+
 function displayProducts(filteredProducts) {
   const element = document.querySelector('.products');
   element.innerHTML = ''; // Clear previous products
-  filteredProducts.forEach(product => {
+  const currentPageProducts = getCurrentPageProducts(filteredProducts);
+  currentPageProducts.forEach(product => {
     const productHtml = `
       <div class="container">
         <img src="${product.image}" alt="">
@@ -78,6 +87,21 @@ function displayProducts(filteredProducts) {
         </div>
       </div>`;
     element.innerHTML += productHtml;
+  });
+  updatePaginationButtons(filteredProducts.length);
+}
+
+function updatePaginationButtons(totalProducts) {
+  const paginationElement = document.querySelector('.pagination');
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  const buttons = paginationElement.querySelectorAll('button');
+
+  buttons.forEach((button, index) => {
+    if (index + 1 > totalPages) {
+      button.style.display = 'none';
+    } else {
+      button.style.display = 'inline-block';
+    }
   });
 }
 
@@ -121,5 +145,13 @@ document.querySelector('#minprice').addEventListener('input', applyFilters);
 document.querySelector('#maxprice').addEventListener('input', applyFilters);
 document.querySelector('#sortproducts').addEventListener('input', applyFilters);
 document.querySelector('#filter').addEventListener('click', applyFilters);
+
+// Pagination button event listeners
+document.querySelectorAll('.pagination button').forEach(button => {
+  button.addEventListener('click', (event) => {
+    currentPage = parseInt(event.target.dataset.page);
+    applyFilters(); // Reapply filters to get the correct page of filtered results
+  });
+});
 
 fetchProducts(); // Ensure products are fetched before applying any filters
